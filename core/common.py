@@ -11,7 +11,9 @@ def estimate_advantages(rewards, masks, values, gamma, tau, device):
     prev_value = 0
     prev_advantage = 0
     for i in reversed(range(rewards.size(0))):
+        # r_t + gamma * V(s_{t+1}) - v(s_{t}) 
         deltas[i] = rewards[i] + gamma * prev_value * masks[i] - values[i]
+        # truncated version of generalized advantage estimation 
         advantages[i] = deltas[i] + gamma * tau * prev_advantage * masks[i]
 
         prev_value = values[i, 0]

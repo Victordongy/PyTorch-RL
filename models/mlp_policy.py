@@ -61,6 +61,7 @@ class Policy(nn.Module):
         std_index = 0
         id = 0
         for name, param in self.named_parameters():
+            # record param id, param counts up to log_std 
             if name == "action_log_std":
                 std_id = id
                 std_index = param_count

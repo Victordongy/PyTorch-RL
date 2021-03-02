@@ -34,7 +34,7 @@ parser.add_argument('--max-kl', type=float, default=1e-2, metavar='G',
                     help='max kl value (default: 1e-2)')
 parser.add_argument('--damping', type=float, default=1e-2, metavar='G',
                     help='damping (default: 1e-2)')
-parser.add_argument('--num-threads', type=int, default=4, metavar='N',
+parser.add_argument('--num-threads', type=int, default=1, metavar='N',
                     help='number of threads for agent (default: 4)')
 parser.add_argument('--seed', type=int, default=1, metavar='N',
                     help='random seed (default: 1)')
@@ -91,16 +91,16 @@ def update_params(batch):
     with torch.no_grad():
         values = value_net(states)
 
-    """get advantage estimation from the trajectories"""
+    #get advantage estimation from the trajectories
     advantages, returns = estimate_advantages(rewards, masks, values, args.gamma, args.tau, device)
 
-    """perform TRPO update"""
+    #perform TRPO update
     trpo_step(policy_net, value_net, states, actions, returns, advantages, args.max_kl, args.damping, args.l2_reg)
 
 
 def main_loop():
     for i_iter in range(args.max_iter_num):
-        """generate multiple trajectories that reach the minimum batch_size"""
+        #generate multiple trajectories that reach the minimum batch_size
         batch, log = agent.collect_samples(args.min_batch_size)
         t0 = time.time()
         update_params(batch)
@@ -116,7 +116,7 @@ def main_loop():
                         open(os.path.join(assets_dir(), 'learned_models/{}_trpo.p'.format(args.env_name)), 'wb'))
             to_device(device, policy_net, value_net)
 
-        """clean up gpu memory"""
+        #clean up gpu memory
         torch.cuda.empty_cache()
 
 

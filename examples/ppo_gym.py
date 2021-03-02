@@ -122,6 +122,9 @@ def update_params(batch, i_iter):
 
 
 def main_loop():
+    scores = []
+    stds = []
+
     for i_iter in range(args.max_iter_num):
         """generate multiple trajectories that reach the minimum batch_size"""
         batch, log = agent.collect_samples(args.min_batch_size)
@@ -141,6 +144,13 @@ def main_loop():
 
         """clean up gpu memory"""
         torch.cuda.empty_cache()
+
+        # save scores and standard variance 
+        scores.append(log["avg_reward"])
+        stds.append(log["std"])
+    
+    stats = np.stack((scores, stds), axis=1)
+    np.savetxt('ppo.csv', stats, delimiter=',')
 
 
 main_loop()

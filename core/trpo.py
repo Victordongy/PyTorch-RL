@@ -27,6 +27,7 @@ def line_search(model, f, x, fullstep, expected_improve_full, max_backtracks=10,
 
     for stepfrac in [.5**x for x in range(max_backtracks)]:
         x_new = x + stepfrac * fullstep
+        # copy x_new to model as parameter 
         set_flat_params_to(model, x_new)
         fval_new = f(True).item()
         actual_improve = fval - fval_new
@@ -43,6 +44,7 @@ def trpo_step(policy_net, value_net, states, actions, returns, advantages, max_k
     """update critic"""
 
     def get_value_loss(flat_params):
+        # copy flat_params to params of value_net 
         set_flat_params_to(value_net, tensor(flat_params))
         for param in value_net.parameters():
             if param.grad is not None:
@@ -110,10 +112,12 @@ def trpo_step(policy_net, value_net, states, actions, returns, advantages, max_k
     loss = get_loss()
     grads = torch.autograd.grad(loss, policy_net.parameters())
     loss_grad = torch.cat([grad.view(-1) for grad in grads]).detach()
+    # step direction 
     stepdir = conjugate_gradients(Fvp, -loss_grad, 10)
 
     shs = 0.5 * (stepdir.dot(Fvp(stepdir)))
     lm = math.sqrt(max_kl / shs)
+    # fullstep = theta - theta_old = s * beta, see https://arxiv.org/pdf/1502.05477v5.pdf appendix C 
     fullstep = stepdir * lm
     expected_improve = -loss_grad.dot(fullstep)
 

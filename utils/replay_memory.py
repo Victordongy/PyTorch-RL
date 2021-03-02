@@ -18,6 +18,8 @@ class Memory(object):
 
     def sample(self, batch_size=None):
         if batch_size is None:
+            # zip(*) convert list of transition object to list of argument 
+            # and then Transition(*) convert to one transition object
             return Transition(*zip(*self.memory))
         else:
             random_batch = random.sample(self.memory, batch_size)

@@ -18,6 +18,9 @@ def collect_samples(pid, queue, env, policy, custom_reward,
     min_c_reward = 1e6
     max_c_reward = -1e6
     num_episodes = 0
+    step_avg = 0 
+    step_var = 0 
+    
 
     while num_steps < min_batch_size:
         state = env.reset()
@@ -61,6 +64,9 @@ def collect_samples(pid, queue, env, policy, custom_reward,
         total_reward += reward_episode
         min_reward = min(min_reward, reward_episode)
         max_reward = max(max_reward, reward_episode)
+        next_step_avg = step_avg * (num_steps - 1) / num_steps + reward_episode / num_steps
+        step_var = (step_var - step_avg ** 2) * (num_steps - 1) / num_steps + reward_episode ** 2 / num_steps + next_step_avg ** 2 
+        step_avg = next_step_avg 
 
     log['num_steps'] = num_steps
     log['num_episodes'] = num_episodes
@@ -68,6 +74,7 @@ def collect_samples(pid, queue, env, policy, custom_reward,
     log['avg_reward'] = total_reward / num_episodes
     log['max_reward'] = max_reward
     log['min_reward'] = min_reward
+    log['std'] = step_var 
     if custom_reward is not None:
         log['total_c_reward'] = total_c_reward
         log['avg_c_reward'] = total_c_reward / num_steps
