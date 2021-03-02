@@ -14,4 +14,4 @@ def plotting(logs:dict, algo:str) :
 
     plt.plot(scores)
     ax.plot(epochs, scores, label=algo)
-    ax.fill_between(epochs, scores-std, scores+std ,alpha=0.3, facecolor=clrs[i])
+    ax.fill_between(epochs, scores-std, scores+std ,alpha=0.3)
