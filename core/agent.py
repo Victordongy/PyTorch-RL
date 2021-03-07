@@ -81,7 +81,7 @@ def collect_samples(pid, queue, env, policy, custom_reward,
     log['avg_reward'] = total_reward / num_episodes
     log['max_reward'] = max_reward
     log['min_reward'] = min_reward
-    log['std'] = step_var 
+    log['std'] = step_var ** (1/2) 
     if custom_reward is not None:
         log['total_c_reward'] = total_c_reward
         log['avg_c_reward'] = total_c_reward / num_steps
@@ -102,6 +102,8 @@ def merge_log(log_list):
     log['avg_reward'] = log['total_reward'] / log['num_episodes']
     log['max_reward'] = max([x['max_reward'] for x in log_list])
     log['min_reward'] = min([x['min_reward'] for x in log_list])
+    log['std'] = np.mean([x['std'] for x in log_list])
+
     if 'total_c_reward' in log_list[0]:
         log['total_c_reward'] = sum([x['total_c_reward'] for x in log_list])
         log['avg_c_reward'] = log['total_c_reward'] / log['num_steps']
@@ -134,12 +136,14 @@ class Agent:
             workers.append(multiprocessing.Process(target=collect_samples, args=worker_args))
         for worker in workers:
             worker.start()
-
+        
+        
         memory, log = collect_samples(0, None, self.env, self.policy, self.custom_reward, mean_action,
                                       render, self.running_state, thread_batch_size)
 
         worker_logs = [None] * len(workers)
         worker_memories = [None] * len(workers)
+        
         for _ in workers:
             pid, worker_memory, worker_log = queue.get()
             worker_memories[pid - 1] = worker_memory
