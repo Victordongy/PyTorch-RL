@@ -13,6 +13,7 @@ from models.mlp_policy_disc import DiscretePolicy
 from core.ppo import ppo_step
 from core.common import estimate_advantages
 from core.agent import Agent
+import pandas as pd 
 
 
 parser = argparse.ArgumentParser(description='PyTorch PPO example')
@@ -154,8 +155,9 @@ def main_loop():
         scores.append(log["avg_reward"])
         stds.append(log["std"])
     
-    stats = np.stack((scores, stds), axis=1)
-    np.savetxt('ppo.csv', stats, delimiter=',')
+    log_dict = {"avg_reward" : scores, "std" : stds}
+    df = pd.DataFrame(log_dict)
+    df.to_csv("ppo.csv")
 
 
 main_loop()
