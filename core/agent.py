@@ -5,6 +5,8 @@ import math
 import time
 import os
 
+# not to use OMP threads within numpy processes.
+# if still blocked, set it explicity with 'export OMP_NUM_THREADS=1'
 os.environ["OMP_NUM_THREADS"] = "1"
 
 
