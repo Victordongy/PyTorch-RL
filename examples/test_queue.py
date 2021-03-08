@@ -36,3 +36,7 @@ if __name__ == "__main__" :
     agent = Agent(2, 2) 
     agent.impl(True)
     agent.impl(False)
+<<<<<<< HEAD
+=======
+
+>>>>>>> f6d5f833a77c9bbc6fdf4ee3ed5223f82fd1aa01
